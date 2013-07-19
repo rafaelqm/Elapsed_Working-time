@@ -1,7 +1,7 @@
-WorkingTimeElapsed
+Elapsed working-time
 ==================
 
-A Mysql function to return a working time elapsed from two dates, giving the begin and the finish of work time.
+A Mysql function to return a elapsed working-time from two dates, giving the begin and the finish of work time.
 
 Run in the MySQL query browser a content of: feriados.sql
 
