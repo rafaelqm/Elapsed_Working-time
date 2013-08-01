@@ -83,6 +83,37 @@ BEGIN
                                WHERE  data_feriado > date(start_datetime)
                                AND    data_feriado < date(finish_datetime)
                              );
+	/*
+	 * If have any holiday_days_between, then see if no one is on the weekend
+	 */
+	IF holiday_days_between > 0 THEN
+		block_holidays:BEGIN
+			DECLARE no_more INT DEFAULT 0;
+			DECLARE v_data_feriado DATE;
+			DECLARE csr CURSOR FOR
+				SELECT data_feriado
+                               FROM   feriados
+                               WHERE  data_feriado > date(start_datetime)
+                               AND    data_feriado < date(finish_datetime);
+			DECLARE CONTINUE HANDLER FOR NOT FOUND SET no_more = 1;
+			OPEN csr;
+			holidays_founded:LOOP
+				FETCH csr INTO v_data_feriado;
+
+				IF no_more = 1 THEN
+					LEAVE holidays_founded;
+				END IF;
+
+				IF ( DATE_FORMAT(v_data_feriado,'%w') = 0 OR DATE_FORMAT(v_data_feriado,'%w') = 6 ) THEN
+					SET holiday_days_between = holiday_days_between - 1;
+				END IF;
+
+			END LOOP holidays_founded;
+			
+
+		END block_holidays;
+	END IF;
+	
   /*
    * is_start_datetime_a_holiday and is_finish_datetime_a_holiday
    */
